@@ -220,7 +220,7 @@ static float kWAYWindowDefaultTrafficLightButtonsTopMargin = 0;
 	NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 10, titleBarHeight-[WAYWindow defaultTitleBarHeight])];
 	_dummyTitlebarAccessoryViewController = [NSTitlebarAccessoryViewController new];
 	_dummyTitlebarAccessoryViewController.view = view;
-	_dummyTitlebarAccessoryViewController.fullScreenMinHeight = titleBarHeight;
+	[self updateFullScreenMinHeight];
 	[self addTitlebarAccessoryViewController:_dummyTitlebarAccessoryViewController];
 	
 	NSRect frame = self.frame;
@@ -232,8 +232,27 @@ static float kWAYWindowDefaultTrafficLightButtonsTopMargin = 0;
 }
 
 - (void) setHidesTitle:(BOOL)hidesTitle {
-	_hidesTitle = hidesTitle;
 	[self setTitleVisibility:hidesTitle ? NSWindowTitleHidden : NSWindowTitleVisible];
+}
+
+- (BOOL)hidesTitle {
+	return self.titleVisibility == NSWindowTitleHidden;
+}
+
+- (void)setHideTitleBarInFullScreen:(BOOL)hideTitleInFullScreen
+{
+    _hideTitleBarInFullScreen = hideTitleInFullScreen;
+    [self updateFullScreenMinHeight];
+    [self _setNeedsLayout];
+}
+
+- (void)updateFullScreenMinHeight {
+	if (self.hideTitleBarInFullScreen) {
+		_dummyTitlebarAccessoryViewController.fullScreenMinHeight = 0;
+	}
+	else {
+		_dummyTitlebarAccessoryViewController.fullScreenMinHeight = self.titleBarHeight;
+	}
 }
 
 - (void) setContentViewAppearanceVibrantDark {
